@@ -1,26 +1,39 @@
-<script setup lang="ts">
-import Versions from './components/Versions.vue'
+<template>
+  <el-container>
+    <el-row>
+      <Menu></Menu>
+    </el-row>
+    <el-container width="200px" class="main-container">
+      <el-main class="main-content" width="100vh">
+        <el-scrollbar>
+          <router-view></router-view>
+        </el-scrollbar>
+      </el-main>
+    </el-container>
+  </el-container>
+</template>
 
-const ipcHandle = () => window.electron.ipcRenderer.send('ping')
+<script setup lang="ts">
+import Menu from './components/Menu.vue'
 </script>
 
-<template>
-  <img alt="logo" class="logo" src="./assets/electron.svg" />
-  <div class="creator">Powered by electron-vite</div>
-  <div class="text">
-    Build an Electron app with
-    <span class="vue">Vue</span>
-    and
-    <span class="ts">TypeScript</span>
-  </div>
-  <p class="tip">Please try pressing <code>F12</code> to open the devTool</p>
-  <div class="actions">
-    <div class="action">
-      <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">Documentation</a>
-    </div>
-    <div class="action">
-      <a target="_blank" rel="noreferrer" @click="ipcHandle">Send IPC</a>
-    </div>
-  </div>
-  <Versions />
-</template>
+<style scoped>
+.main-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  /* 修改此处以允许footer附着在底部 */
+  align-items: center;
+  height: 100vh;
+  text-align: center;
+}
+
+.main-content {
+  max-width: 1200px;
+  /* 最大宽度为 1200px */
+  width: 100%;
+  /* 使宽度可以根据视口大小变化 */
+  margin: 0 auto;
+  /* 水平居中 */
+}
+</style>
