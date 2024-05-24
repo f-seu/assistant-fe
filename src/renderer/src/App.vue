@@ -1,8 +1,8 @@
 <template>
   <el-container>
-    <el-row>
+    <el-affix>
       <Menu></Menu>
-    </el-row>
+    </el-affix>
     <el-container width="200px" class="main-container">
       <el-main class="main-content" width="100vh">
         <el-scrollbar>
@@ -19,9 +19,6 @@ import Menu from './components/Menu.vue'
 
 <style scoped>
 .main-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
   /* 修改此处以允许footer附着在底部 */
   align-items: center;
   height: 100vh;
