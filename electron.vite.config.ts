@@ -16,7 +16,8 @@ export default defineConfig({
     resolve: {
       alias: {
         '@renderer': resolve('src/renderer/src'),
-        '@pages': resolve('src/renderer/src/pages')
+        '@pages': resolve('src/renderer/src/pages'),
+        '@assets': resolve('src/renderer/src/assets')
       }
     },
     plugins: [
