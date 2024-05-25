@@ -6,7 +6,11 @@
     <el-container class="main-container">
       <el-main class="main-content" width="100vh">
         <el-scrollbar>
-          <router-view></router-view>
+          <router-view v-slot="{ Component }">
+            <keep-alive>
+              <component :is="Component" />
+            </keep-alive>
+          </router-view>
         </el-scrollbar>
       </el-main>
     </el-container>
@@ -24,6 +28,7 @@ import Menu from './components/Menu.vue'
   text-align: center;
   padding: 0;
 }
+
 .main-container {
   /* 修改此处以允许footer附着在底部 */
   align-items: center;
@@ -39,7 +44,7 @@ import Menu from './components/Menu.vue'
   width: 100%;
   /* 使宽度可以根据视口大小变化 */
   margin: 0 auto;
-  padding:0;
+  padding: 0;
   /* 水平居中 */
 }
 </style>

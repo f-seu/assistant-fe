@@ -47,7 +47,6 @@ const menuWidth = ref('64')
 #menu {
   min-height: 100vh;
   padding-top: 20vh;
-  /* 调整这个值以增加距离 */
 }
 
 a {
