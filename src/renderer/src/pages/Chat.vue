@@ -1,27 +1,33 @@
 <template>
-    <el-container>
-        <el-aside class="chat-list">
-            <el-scrollbar class="infinite-list">
-                <div v-infinite-scroll="load" :infinite-scroll-disabled="busy">
-                    <div v-for="item in chatList" :key="item.name" class="infinite-list-item">
-                        {{ item.name }}
+    <el-row>
+        <el-col :span="4" class="chat-list-col">
+            <el-scrollbar>
+                <ul class="chat-list">
+                    <li v-for="item in chatList" :key="item.name" class="chat-list-item">
+                        {{ item.desc }}
+                    </li>
+                </ul>
+
+            </el-scrollbar>
+        </el-col>
+        <el-col :span="20" class="chat-container">
+            <el-row class="message-list-container">
+
+                <el-scrollbar class="messages">
+                    <div v-for="message in messages" :key="message.id" class="message-content"
+                        :class="{ 'is-user': message.isUser }">
+                        {{ message.text }}
                     </div>
-                </div>
-            </el-scrollbar>
-        </el-aside>
-        <el-main class="chat-window">
-            <el-scrollbar class="messages">
-                <div v-for="message in messages" :key="message.id" class="message"
-                    :class="{ 'is-user': message.isUser }">
-                    {{ message.text }}
-                </div>
-            </el-scrollbar>
-            <div class="input-container">
-                <input v-model="newMessage" @keyup.enter="sendMessage" type="textarea" placeholder="请输入内容" class="message-input">
+                </el-scrollbar>
+
+            </el-row>
+            <el-row class="input-container">
+                <input v-model="newMessage" @keyup.enter="sendMessage" type="textarea" placeholder="请输入内容"
+                    class="message-input">
                 <el-button type="primary" @click="sendMessage">发送</el-button>
-            </div>
-        </el-main>
-    </el-container>
+            </el-row>
+        </el-col>
+    </el-row>
 </template>
 
 
@@ -58,7 +64,7 @@ const sendMessage = () => {
         messages.value.push({
             id: messages.value.length + 1,
             text: newMessage.value,
-            isUser: true
+            isUser: messages.value.length%2==0
         });
         newMessage.value = '';  // 清空输入框
     }
@@ -66,15 +72,16 @@ const sendMessage = () => {
 
 </script>
 <style>
-.infinite-list {
+.chat-list {
     height: 100vh;
     padding: 0;
     margin: 0;
     list-style: none;
     overflow: auto;
+    border-right: 1px solid #ccc;
 }
 
-.infinite-list-item {
+.chat-list-item {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -84,48 +91,9 @@ const sendMessage = () => {
     color: var(--el-color-primary);
 }
 
-.chat-list {
-    height: 100vh;
-    border-right: 1px solid #dcdfe6;
-    overflow: auto;
-    width: 160px;
+.message-content{
+    
+ 
 }
 
-.chat-window {
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
-
-.messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 10px;
-}
-
-.message {
-    margin-bottom: 10px;
-    padding: 10px;
-    border-radius: 10px;
-    background-color: #f0f0f0;
-}
-
-.message.is-user {
-    background-color: #blue;
-    align-self: flex-end;
-}
-
-.input-container {
-    display: flex; /* 使用 flex 布局 */
-    padding: 10px;
-}
-
-.message-input {
-    flex: 1; /* 输入框占据剩余空间 */
-    margin-right: 10px; /* 与发送按钮的间距 */
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-}
 </style>
