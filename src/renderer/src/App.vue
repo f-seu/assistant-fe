@@ -39,8 +39,6 @@ import Menu from './components/Menu.vue'
 }
 
 .main-content {
-  max-width: 1200px;
-  /* 最大宽度为 1200px */
   width: 100%;
   /* 使宽度可以根据视口大小变化 */
   margin: 0 auto;
