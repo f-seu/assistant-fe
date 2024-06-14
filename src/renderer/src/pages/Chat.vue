@@ -3,34 +3,38 @@
         <el-col :span="6" class="chat-list-col">
             <el-scrollbar class="chat-list-container">
                 <ul class="chat-list">
-                    <el-row v-for="item in chatList.items.value" :key="item.name" class="chat-list-item"
+                    <el-row
+v-for="item in chatList.items.value" :key="item.name" class="chat-list-item"
                         @click="chatList.handleItemClick(item)">
                         {{ item.desc }}
                     </el-row>
                 </ul>
             </el-scrollbar>
             <el-row class="pagination-container">
-                <el-pagination small layout="prev, pager, next" :total="chatList.items.value.length"
-                    :page-size="chatList.pageSize.value" :current-page="chatList.currentPage.value"
+                <el-pagination
+small layout="prev, pager, next" :total="chatList.items.value.length"
+                    :page-size="10" :current-page="chatList.currentPage.value"
                     @current-change="chatList.handlePageChange" />
             </el-row>
         </el-col>
         <el-col :span="18" class="chat-container">
             <el-row class="message-list-container">
                 <el-scrollbar class="message-list">
-                    <div v-for="message in message.messages.value" :key="message.id" class="message-content"
-                        :class="{ 'is-user': message.isUser }">
-                        <h3 v-if="message.isUser">You</h3>
-                        <h3 v-if="!message.isUser">Assistant</h3>
+                    <div
+                        v-for="item in message.messages.value" :key="item.id" class="message-content"
+                        :class="{ 'is-user': item.isUser }">
+                        <h3 v-if="item.isUser">You</h3>
+                        <h3 v-if="!item.isUser">Assistant</h3>
 
-                        {{ message.text }}
+                        {{ item.text }}
                     </div>
                 </el-scrollbar>
             </el-row>
             <el-row class="input-container">
                 <el-col :span="20">
-                    <el-input v-model="message.newMessage.value" :rows="6" type="textarea" @keyup.enter="message.sendMessage"
-                        placeholder="请输入内容" class="message-input" />
+                    <el-input
+                        v-model="message.newMessage.value" :rows="6" type="textarea" placeholder="请输入内容"
+                        class="message-input" @keyup.enter="message.sendMessage" />
                 </el-col>
                 <el-col :span="4"><el-button type="primary" @click="message.sendMessage">发送</el-button></el-col>
             </el-row>
@@ -39,51 +43,56 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { chatListAPI, chatListTotalAPI } from '@renderer/request/api';
+import { ref, onMounted } from "vue";
+import { chatListAPI, chatListTotalAPI } from "@renderer/request/api";
 
 interface ChatItemData {
     name: string;
     desc: string;
 }
 class ChatList {
-
     pageSize = ref(10);
     currentPage = ref(1);
     busy = ref(false);
     total = ref(100); // 假设总共有100条数据
     items = ref<ChatItemData[]>([
-        { name: 'chat1', desc: 'chat1' },
-        { name: 'chat2', desc: 'chat2' },
-        { name: 'chat3', desc: 'chat3' },
-        { name: 'chat4', desc: 'chat4' },
-        { name: 'chat5', desc: 'chat5' },
-        { name: 'chat6', desc: 'chat6' },
-        { name: 'chat7', desc: 'chat7' },
-        { name: 'chat8', desc: 'chat8' },
-        { name: 'chat9', desc: 'chat9' },
-        { name: 'chat10', desc: 'chat10' }
+        { name: "chat1", desc: "chat1" },
+        { name: "chat2", desc: "chat2" },
+        { name: "chat3", desc: "chat3" },
+        { name: "chat4", desc: "chat4" },
+        { name: "chat5", desc: "chat5" },
+        { name: "chat6", desc: "chat6" },
+        { name: "chat7", desc: "chat7" },
+        { name: "chat8", desc: "chat8" },
+        { name: "chat9", desc: "chat9" },
+        { name: "chat10", desc: "chat10" },
     ]);
     loadTotal = () => {
-        chatListTotalAPI().then((res) => {
-            this.total.value = res.data;
-        }).catch((err) => {
-            alert("请求消息总数失败：" + err.message)
-        })
+        chatListTotalAPI()
+            .then((res) => {
+                this.total.value = res.data;
+            })
+            .catch((err) => {
+                alert("请求消息总数失败：" + err.message);
+            });
     };
     load = () => {
         if (this.busy.value || this.items.value.length >= this.total.value) {
             return;
         }
         this.busy.value = true;
-        chatListAPI((this.currentPage.value - 1) * this.pageSize.value, this.currentPage.value * this.pageSize.value).then((res) => {
-            this.items.value = this.items.value.concat(res.data);
-            this.busy.value = false;
-        }).catch((err) => {
-            this.busy.value = false;
-            alert("请求消息列表失败：" + err.message)
-        })
-
+        chatListAPI(
+            (this.currentPage.value - 1) * this.pageSize.value,
+            this.currentPage.value * this.pageSize.value,
+        )
+            .then((res) => {
+                this.items.value = res.data;
+                this.busy.value = false;
+            })
+            .catch((err) => {
+                this.busy.value = false;
+                alert("请求消息列表失败：" + err.message);
+            });
     };
     handleItemClick = (item) => {
         alert(`Clicked on: ${item.name}`);
@@ -92,7 +101,6 @@ class ChatList {
         this.currentPage.value = page;
         this.load();
     };
-
 }
 interface MessageData {
     id: number;
@@ -100,30 +108,28 @@ interface MessageData {
     isUser: boolean;
 }
 
-
 class Message {
-
-    newMessage = ref<string>('');
+    newMessage = ref<string>("");
     messages = ref<MessageData[]>([
-        { id: 1, text: 'Hello', isUser: false },
-        { id: 2, text: 'Hi', isUser: true },
-        { id: 3, text: 'How are you?', isUser: false },
-        { id: 4, text: 'I am fine', isUser: true },
-        { id: 5, text: 'Good to hear that', isUser: false },
-        { id: 6, text: 'Thank you', isUser: true },
-        { id: 7, text: 'You are welcome', isUser: false },
-        { id: 8, text: 'Goodbye', isUser: true },
-        { id: 9, text: 'See you later', isUser: false },
-        { id: 10, text: 'Bye', isUser: true }
+        { id: 1, text: "Hello", isUser: false },
+        { id: 2, text: "Hi", isUser: true },
+        { id: 3, text: "How are you?", isUser: false },
+        { id: 4, text: "I am fine", isUser: true },
+        { id: 5, text: "Good to hear that", isUser: false },
+        { id: 6, text: "Thank you", isUser: true },
+        { id: 7, text: "You are welcome", isUser: false },
+        { id: 8, text: "Goodbye", isUser: true },
+        { id: 9, text: "See you later", isUser: false },
+        { id: 10, text: "Bye", isUser: true },
     ]);
     sendMessage = () => {
-        if (this.newMessage.value.trim() !== '') {
+        if (this.newMessage.value.trim() !== "") {
             this.messages.value.push({
                 id: this.messages.value.length + 1,
                 text: this.newMessage.value,
-                isUser: true
+                isUser: true,
             });
-            this.newMessage.value = '';  // 清空输入框
+            this.newMessage.value = ""; // 清空输入框
         }
     };
 }
@@ -188,6 +194,7 @@ onMounted(() => {
     justify-content: center;
     width: 100%;
 }
+
 .message-list {
     padding: 0;
     margin: 0;
