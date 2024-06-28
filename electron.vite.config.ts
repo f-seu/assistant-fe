@@ -18,7 +18,8 @@ export default defineConfig({
       alias: {
         '@renderer': resolve('src/renderer/src'),
         '@pages': resolve('src/renderer/src/pages'),
-        '@assets': resolve('src/renderer/src/assets')
+        '@assets': resolve('src/renderer/src/assets'),
+        '@components': resolve('src/renderer/src/components')
       }
     },
     plugins: [
@@ -30,6 +31,14 @@ export default defineConfig({
         resolvers: [ElementPlusResolver()]
       }),
       svgLoader()
-    ]
+    ],
+    server: {
+      proxy: {
+        '/api': { // 匹配请求路径，
+          target: 'http://127.0.0.1:8000/', // 代理的目标地址
+          changeOrigin: true,
+        },
+      }
+    }
   }
 })

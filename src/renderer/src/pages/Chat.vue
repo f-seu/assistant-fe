@@ -6,13 +6,13 @@
                     <el-row
 v-for="item in chatList.items.value" :key="item.name" class="chat-list-item"
                         @click="chatList.handleItemClick(item)">
-                        {{ item.desc }}
+                        {{ item.name }}
                     </el-row>
                 </ul>
             </el-scrollbar>
             <el-row class="pagination-container">
                 <el-pagination
-small layout="prev, pager, next" :total="chatList.items.value.length"
+small layout="prev, pager, next" :total="chatList.total.value"
                     :page-size="10" :current-page="chatList.currentPage.value"
                     @current-change="chatList.handlePageChange" />
             </el-row>
@@ -22,11 +22,10 @@ small layout="prev, pager, next" :total="chatList.items.value.length"
                 <el-scrollbar class="message-list">
                     <div
                         v-for="item in message.messages.value" :key="item.id" class="message-content"
-                        :class="{ 'is-user': item.isUser }">
-                        <h3 v-if="item.isUser">You</h3>
-                        <h3 v-if="!item.isUser">Assistant</h3>
-
-                        {{ item.text }}
+                        :class="{ 'is-user': item.role == 'user' }">
+                        <h3 v-if="item.role == 'user'">You</h3>
+                        <h3 v-if="item.role != 'user'">Assistant</h3>
+                        {{ item.content}}
                     </div>
                 </el-scrollbar>
             </el-row>
@@ -44,58 +43,49 @@ small layout="prev, pager, next" :total="chatList.items.value.length"
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { chatListAPI, chatListTotalAPI } from "@renderer/request/api";
+import { chatListAPI, chatNumAPI,getMessageAPI} from "@renderer/request/api";
 
 interface ChatItemData {
+    id:number;
     name: string;
-    desc: string;
 }
 class ChatList {
     pageSize = ref(10);
     currentPage = ref(1);
-    busy = ref(false);
-    total = ref(100); // 假设总共有100条数据
+    total = ref(0); // 假设总共有100条数据
     items = ref<ChatItemData[]>([
-        { name: "chat1", desc: "chat1" },
-        { name: "chat2", desc: "chat2" },
-        { name: "chat3", desc: "chat3" },
-        { name: "chat4", desc: "chat4" },
-        { name: "chat5", desc: "chat5" },
-        { name: "chat6", desc: "chat6" },
-        { name: "chat7", desc: "chat7" },
-        { name: "chat8", desc: "chat8" },
-        { name: "chat9", desc: "chat9" },
-        { name: "chat10", desc: "chat10" },
+    
     ]);
     loadTotal = () => {
-        chatListTotalAPI()
+        chatNumAPI()
             .then((res) => {
-                this.total.value = res.data;
+                this.total.value = res.data['data'];
             })
             .catch((err) => {
                 alert("请求消息总数失败：" + err.message);
             });
     };
     load = () => {
-        if (this.busy.value || this.items.value.length >= this.total.value) {
-            return;
-        }
-        this.busy.value = true;
         chatListAPI(
             (this.currentPage.value - 1) * this.pageSize.value,
             this.currentPage.value * this.pageSize.value,
         )
             .then((res) => {
-                this.items.value = res.data;
-                this.busy.value = false;
+                this.items.value = res.data['data'];
+                console.log(this.items.value)
             })
             .catch((err) => {
-                this.busy.value = false;
                 alert("请求消息列表失败：" + err.message);
             });
     };
     handleItemClick = (item) => {
-        alert(`Clicked on: ${item.name}`);
+        getMessageAPI(item.id)
+            .then((res) => {
+                message.messages.value = res.data['data'];
+            })
+            .catch((err) => {
+                alert("请求消息失败：" + err.message);
+            });
     };
     handlePageChange = (page) => {
         this.currentPage.value = page;
@@ -104,34 +94,79 @@ class ChatList {
 }
 interface MessageData {
     id: number;
-    text: string;
-    isUser: boolean;
+    content: string;
+    role:string;
 }
 
 class Message {
     newMessage = ref<string>("");
     messages = ref<MessageData[]>([
-        { id: 1, text: "Hello", isUser: false },
-        { id: 2, text: "Hi", isUser: true },
-        { id: 3, text: "How are you?", isUser: false },
-        { id: 4, text: "I am fine", isUser: true },
-        { id: 5, text: "Good to hear that", isUser: false },
-        { id: 6, text: "Thank you", isUser: true },
-        { id: 7, text: "You are welcome", isUser: false },
-        { id: 8, text: "Goodbye", isUser: true },
-        { id: 9, text: "See you later", isUser: false },
-        { id: 10, text: "Bye", isUser: true },
+        
     ]);
     sendMessage = () => {
-        if (this.newMessage.value.trim() !== "") {
-            this.messages.value.push({
-                id: this.messages.value.length + 1,
-                text: this.newMessage.value,
-                isUser: true,
-            });
-            this.newMessage.value = ""; // 清空输入框
+    if (!this.newMessage.value.trim()) {
+      alert("消息内容不能为空或未选择聊天！");
+      return;
+    }
+
+    fetch("/api/chat-message/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        chatid: 36,
+        message: this.newMessage.value,
+      }),
+    })
+      .then((response) => {
+        if (response.body === null) {
+          throw new Error("Response body is null");
         }
-    };
+        let first=true;
+        function processText(text,first) {
+                const lines = text.split("\n\n");
+                lines.forEach(line => {
+                    if (line.startsWith("data: ")) {
+                        const message1 = JSON.parse(line.slice(6));
+                        if(first){
+                            message.messages.value.push({ id: Date.now(), content: message1.text, role: "assistant" });
+                        }else{
+                            console.log(message.messages.value[-1])
+                            const len = message.messages.value.length-1;
+                            message.messages.value[len].content += message1.text;
+                        }
+                        
+                    }
+                });
+            }
+        const reader = response.body.getReader();
+        return new ReadableStream({
+          start(controller) {
+            function push() {
+               
+              reader.read().then(({ done, value }) => {
+                
+                if (done) {
+                  controller.close();
+                  return;
+                }
+                const text = new TextDecoder("utf-8").decode(value);
+                console.log(text)
+                processText(text,first);
+                first= false;
+                push();
+              });
+            }
+            push();
+          }
+        });
+      })
+      .catch((err) => {
+        alert("发送消息失败：" + err.message);
+      });
+    this.newMessage.value = "";
+  };
 }
 const message = new Message();
 const chatList = new ChatList();
