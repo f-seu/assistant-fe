@@ -15,7 +15,7 @@ export const getMessageAPI =
     (chatid: number) =>
         instance.get(`/chat-message?chatid=${chatid}`)
 
-export const newMessageAPI =
-    (chatid: number, message: string) =>
-        instance.post(`/chat-message`, { "chatid": chatid, "message": message })
+export const newChatAPI =
+    ( message: string) =>
+        instance.post(`/chat/`, { "message": message })
 

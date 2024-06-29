@@ -11,9 +11,11 @@
     "composite": true,
     "baseUrl": ".",
     "paths": {
-      "@renderer/*": [
-        "src/renderer/src/*"
-      ]
+      "@renderer/*": ["src/renderer/src/*"],
+      "@pages/*": ["src/renderer/src/pages/*"],
+      "@assets/*": ["src/renderer/src/assets/*"],
+      "@components/*": ["src/renderer/src/components/*"],
+      "@store/*": ["src/renderer/src/store/*"]
     }
   }
 }
