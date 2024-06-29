@@ -8,14 +8,23 @@ const routes = [
     redirect: () => {
       // 方法接收目标路由作为参数
       // return 重定向的字符串路径/路径对象
-      return { path: '/home' }
+      return { path: '/chat' }
     }
   },
   {
-    path: '/home',
-    name: 'home',
-
-    component: () => import('@pages/Home.vue')
+    path: '/chat',
+    name: 'chat',
+    component: () => import('@pages/Chat.vue')
+  },
+  {
+    path: '/calender',
+    name: 'calender',
+    component: () => import('@pages/Calender.vue')
+  },
+  {
+    path: '/recommand',
+    name: 'recommand',
+    component: () => import('@pages/Recommand.vue')
   }
 ]
 // 路由
