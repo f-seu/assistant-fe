@@ -6,7 +6,9 @@
     <el-scrollbar class="chat-list-container">
       <ul class="chat-list">
         <el-row v-for="item in chatItems" :key="item.id" class="chat-list-item" @click="handleItemClick(item)">
-          {{ truncatedName(item.name) }}
+          <el-tooltip :content="item.name" placement="top">
+            <div>{{ truncatedName(item.name) }}</div>
+          </el-tooltip>
         </el-row>
       </ul>
     </el-scrollbar>
@@ -18,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted} from "vue";
+import { ref, onMounted } from "vue";
 import { chatListAPI, chatNumAPI } from "@renderer/request/api";
 import { useChatStore } from '@store/chat';
 import { storeToRefs } from "pinia";
