@@ -200,5 +200,9 @@ onMounted(() => {
   border-radius: 15px 15px 15px 0;
   float: left; /* 助手消息左对齐 */
 }
-
+.message-box{
+  text-align: left;
+  word-wrap: break-word;
+  user-select: text;
+}
 </style>
