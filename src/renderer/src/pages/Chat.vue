@@ -1,5 +1,6 @@
 <template>
     <el-row>
+        
         <ChatList  />
         <Message/>
     </el-row>
