@@ -1,4 +1,5 @@
 <template>
+  <el-config-provider :locale="zhCn">
   <el-container class="app-container">
     <el-affix>
       <Menu></Menu>
@@ -15,10 +16,13 @@
       </el-main>
     </el-container>
   </el-container>
+</el-config-provider>
 </template>
 
 <script setup lang="ts">
 import Menu from './components/Menu.vue'
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
+
 </script>
 
 <style scoped>

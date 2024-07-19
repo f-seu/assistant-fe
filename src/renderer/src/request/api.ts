@@ -19,3 +19,8 @@ export const newChatAPI =
     ( message: string) =>
         instance.post(`/chat/`, { "message": message })
 
+export const getCalendarMessageAPI = (year: number, month: number, day: number) => 
+    instance.get(`/calendar?year=${year}&month=${month}&day=${day}`);
+
+export const newCalendarMessageAPI = (year: number, month: number, day: number, content: string) => 
+    instance.put(`/calendar/`, { "year":year, "month":month, "day":day, "content":content });
