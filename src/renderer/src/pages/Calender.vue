@@ -24,8 +24,8 @@
         <div class="plan-content" v-html="planRender"></div>
         <template #footer>
             <div class="dialog-footer">
-                <el-button @click="planVisible = false">关闭</el-button>
-                <el-button type="primary" @click="getPlan(true)">
+                <el-button class="button" @click="planVisible = false">关闭</el-button>
+                <el-button class="button" type="primary" @click="getPlan(true)">
                     重新规划
                 </el-button>
             </div>
@@ -224,11 +224,13 @@ onMounted(() => {
     height: 20vh;
  
 }
+.el-button{
+    margin-bottom: 10px;
+}
 .button-container {
     padding: 10px;
     display: flex;
     flex-direction: column;
-    justify-content: top;
     align-items: center;
 }
 
