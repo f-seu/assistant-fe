@@ -1,6 +1,3 @@
-/* eslint-env node */
-require('@rushstack/eslint-patch/modern-module-resolution')
-
 module.exports = {
   extends: [
     'eslint:recommended',
@@ -16,6 +13,5 @@ module.exports = {
     'prettier/prettier': 'off',
     "@typescript-eslint/no-unused-vars": ["error", { "varsIgnorePattern": "^_" }],
     'vue/first-attribute-linebreak': 'off',
-
   }
 }

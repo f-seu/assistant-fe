@@ -12,7 +12,7 @@
       <el-col :span="20">
         <el-input v-model="inputMessage" :rows="6" type="textarea" placeholder="请输入内容" class="message-input" @keyup.enter="handleSendMessage" />
       </el-col>
-      <el-col :span="4"><el-button type="primary" @click="handleSendMessage" :loading="sendLoading">发送</el-button></el-col>
+      <el-col :span="4"><el-button type="primary" :loading="sendLoading" @click="handleSendMessage" >发送</el-button></el-col>
     </el-row>
   </el-col>
 </template>
