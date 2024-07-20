@@ -2,17 +2,19 @@
   <el-col :span="18" class="chat-container">
     <el-row class="message-list-container">
       <el-scrollbar class="message-list">
-        <div v-for="item in messages" :key="item.id" class="message-content" :class="{ 'is-user': item.role == 'user', 'is-assistant': item.role != 'user' }">
-          <!-- <div class="message-header">{{ item.role == 'user' ? 'You' : 'Assistant' }}</div> -->
+        <div v-for="item in messages" :key="item.id" class="message-content"
+          :class="{ 'is-user': item.role == 'user', 'is-assistant': item.role != 'user' }">
           <div class="message-box">{{ item.content }}</div>
         </div>
       </el-scrollbar>
     </el-row>
     <el-row class="input-container">
       <el-col :span="20">
-        <el-input v-model="inputMessage" :rows="6" type="textarea" placeholder="请输入内容" class="message-input" @keyup.enter="handleSendMessage" />
+        <el-input v-model="inputMessage" :rows="6" type="textarea" placeholder="请输入内容" class="message-input"
+          @keyup.enter="handleSendMessage" />
       </el-col>
-      <el-col :span="4"><el-button type="primary" :loading="sendLoading" @click="handleSendMessage" >发送</el-button></el-col>
+      <el-col :span="4"><el-button type="primary" :loading="sendLoading"
+          @click="handleSendMessage">发送</el-button></el-col>
     </el-row>
   </el-col>
 </template>
@@ -44,7 +46,7 @@ const sendMessage = (messageContent: string) => {
       if (response.body === null) {
         throw new Error("Response body is null");
       }
-      let first = true;
+      const index = messages.value.push({ id: Date.now(), content: "", role: "assistant" }) - 1;
       const reader = response.body.getReader();
       return new ReadableStream({
         start(controller) {
@@ -56,8 +58,7 @@ const sendMessage = (messageContent: string) => {
                 return;
               }
               const text = new TextDecoder("utf-8").decode(value);
-              processText(text, first);
-              first = false;
+              processText(text,index);
               push();
             });
           }
@@ -71,23 +72,18 @@ const sendMessage = (messageContent: string) => {
 
 };
 
-const processText = (text, first) => {
+const processText = (text, index) => {
   inputMessage.value = "";
   const lines = text.split("\n\n");
   lines.forEach(line => {
     if (line.startsWith("data: ")) {
       const messageResp = JSON.parse(line.slice(6));
-      if (first) {
-        messages.value.push({ id: Date.now(), content: messageResp.text, role: "assistant" });
-      } else {
-        const len = messages.value.length - 1;
-        messages.value[len].content += messageResp.text;
-      }
+      messages.value[index].content += messageResp.text;
     }
   });
 }
 const handleSendMessage = () => {
-  if(sendLoading.value) {
+  if (sendLoading.value) {
     return;
   }
   sendLoading.value = true;
@@ -144,8 +140,8 @@ const getMessage = () => {
 }
 
 watch(() => selectedChatId.value, () => {
-    getMessage();
- 
+  getMessage();
+
 });
 
 onMounted(() => {
@@ -171,36 +167,49 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
 }
+
 .message-list {
   width: 100%;
-  display: grid; /* 使用网格布局 */
-  grid-template-columns: 1fr; /* 单列布局 */
+  display: grid;
+  /* 使用网格布局 */
+  grid-template-columns: 1fr;
+  /* 单列布局 */
 }
 
 .message-content {
-  display: block; /* 让宽度根据内容自动调整 */
+  display: block;
+  /* 让宽度根据内容自动调整 */
   word-wrap: break-word;
   background-color: #f0f0f0;
   color: #333;
   border-radius: 15px;
   padding: 10px;
-  max-width: 70%; /* 最大宽度限制 */
-  width: fit-content; /* 根据内容自动调整宽度 */
-  clear: both; /* 防止浮动元素相互覆盖 */
+  max-width: 70%;
+  /* 最大宽度限制 */
+  width: fit-content;
+  /* 根据内容自动调整宽度 */
+  clear: both;
+  /* 防止浮动元素相互覆盖 */
 }
 
 .is-user {
   background-color: #d4f1c5;
   border-radius: 15px 15px 0 15px;
-  float: right; /* 用户消息右对齐 */
+  float: right;
+  margin-top: 10px;
+  /* 用户消息右对齐 */
 }
 
 .is-assistant {
   background-color: #f0f0f0;
   border-radius: 15px 15px 15px 0;
-  float: left; /* 助手消息左对齐 */
+  float: left;
+  margin-top: 10px;
+
+  /* 助手消息左对齐 */
 }
-.message-box{
+
+.message-box {
   text-align: left;
   word-wrap: break-word;
   user-select: text;
