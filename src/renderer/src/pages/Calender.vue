@@ -1,5 +1,5 @@
 <template>
-    <el-row class="calender-container">
+    <el-row class="calendar-container">
         <el-scrollbar>
             <el-calendar v-model="selectDate">
                 <template #date-cell="{ data }">
@@ -11,13 +11,11 @@
             </el-calendar>
         </el-scrollbar>
     </el-row>
-    <el-row>
-        <el-col :span="20">
-            <el-input v-model="calenderContent" type="textarea">
-
-            </el-input>
+    <el-row class="bottom-container">
+        <el-col :span="20" class="input-container">
+            <el-input v-model="calendarContent" type="textarea" rows="6"></el-input>
         </el-col>
-        <el-col :span="4">
+        <el-col :span="2" class="button-container">
             <el-button type="primary" @click="updateCalendar">更新</el-button>
             <el-button type="primary" @click="getPlan(false)">规划日程</el-button>
         </el-col>
@@ -33,18 +31,18 @@
             </div>
         </template>
     </el-dialog>
-
 </template>
+
 
 <script lang="ts" setup>
 
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { ElNotification } from 'element-plus'
 import { getPlanAPI, getCalendarAPI, updateCalendarAPI } from '@renderer/request/api';
 import markdownit from 'markdown-it'
 
 const md = markdownit();
-const calenderContent = ref("");
+const calendarContent = ref("");
 const plan = ref("");
 const planRender = ref("");
 const planVisible = ref(false);
@@ -58,7 +56,7 @@ const getPlan = (forceUpdate) => {
 
     if (forceUpdate) {
         planVisible.value = false;
-        getPlanAPI(year, month, day,true)
+        getPlanAPI(year, month, day, true)
             .then((res) => {
                 const data = res.data;
                 const code = data['code'];
@@ -90,7 +88,7 @@ const getPlan = (forceUpdate) => {
 
         return;
     }
-    getPlanAPI(year, month, day,false)
+    getPlanAPI(year, month, day, false)
         .then((res) => {
             const code = res.data['code'];
             if (code == 2002) {
@@ -115,7 +113,7 @@ const getPlan = (forceUpdate) => {
                 })
                 return;
             }
-        
+
         })
         .catch((err) => {
             ElNotification({
@@ -129,9 +127,7 @@ const getPlan = (forceUpdate) => {
 
 }
 
-watch(selectDate, (newVal) => {
-    const date = newVal.toLocaleDateString().split('/');
-    console.log(newVal.toLocaleDateString());
+const getCalendarContent = (date) => {
     getCalendarAPI(
         parseInt(date[0]),
         parseInt(date[1]),
@@ -140,14 +136,14 @@ watch(selectDate, (newVal) => {
         .then((res) => {
             const code = res.data['code'];
             if (code == 0) {
-                calenderContent.value = res.data['data']['content'];
+                calendarContent.value = res.data['data']['content'];
             } else {
                 ElNotification({
                     title: '获取失败',
                     message: '获取日程失败，请稍后再试:' + code,
                     type: 'error',
                 })
-                calenderContent.value = "";
+                calendarContent.value = "";
             }
         })
         .catch((err) => {
@@ -157,9 +153,16 @@ watch(selectDate, (newVal) => {
                 type: 'error',
             })
         });
+}
+
+watch(selectDate, (newVal) => {
+    const date = newVal.toLocaleDateString().split('/');
+    console.log(newVal.toLocaleDateString());
+    getCalendarContent(date);
+
 });
 
-watch(plan,(newVal)=>{
+watch(plan, (newVal) => {
     newVal = newVal.replace(/\\n/g, "\n");
     planRender.value = md.render(newVal);
 
@@ -170,7 +173,7 @@ const updateCalendar = () => {
         parseInt(date[0]),
         parseInt(date[1]),
         parseInt(date[2]),
-        calenderContent.value
+        calendarContent.value
     )
         .then((res) => {
             const code = res.data['code'];
@@ -197,6 +200,11 @@ const updateCalendar = () => {
         });
 }
 
+onMounted(() => {
+    const date = selectDate.value.toLocaleDateString().split('/');
+    getCalendarContent(date);
+});
+
 </script>
 
 <style scoped>
@@ -207,4 +215,23 @@ const updateCalendar = () => {
 .plan-content * {
     text-align: left;
 }
+
+.calendar-container {
+    margin: 10px;
+
+}
+.bottom-container {
+    height: 20vh;
+ 
+}
+.button-container {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: top;
+    align-items: center;
+}
+
 </style>
+
+

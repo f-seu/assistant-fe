@@ -2,6 +2,7 @@
   <el-col :span="6" class="chat-list-col">
     <el-row class="new-chat-container">
       <el-button type="primary" @click="newChat">新建</el-button>
+      <el-button type="primary" @click="loadAll">刷新</el-button>
     </el-row>
     <el-scrollbar class="chat-list-container">
       <ul class="chat-list">
@@ -73,9 +74,13 @@ const truncatedName = (name: string) => {
   }
   return name;
 };
-onMounted(() => {
+
+const loadAll = () => {
   loadTotal();
   loadChatList();
+};
+onMounted(() => {
+  loadAll();
 });
 </script>
 
@@ -91,13 +96,23 @@ onMounted(() => {
 }
 
 .chat-list-container {
-  height: 90vh;
+  max-height: 85vh;
   padding: 0;
   margin: 0;
   list-style: none;
   overflow: auto;
 }
-
+.new-chat-container{
+  display: flex;
+  justify-content:center;
+  margin-top:10px;
+  margin-bottom:10px;
+  height: 5vh;
+}
+.pagination-container{
+  display: flex;
+  justify-content:center;
+}
 .chat-list {
   padding: 0;
   margin: 0;
