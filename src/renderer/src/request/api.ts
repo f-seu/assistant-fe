@@ -27,3 +27,6 @@ export const updateCalendarAPI = (year: number, month: number, day: number, cont
 
 export const getPlanAPI = (year: number, month: number, day: number,force_update:boolean) =>
     instance.get(`/plan?year=${year}&month=${month}&day=${day}&force_update=${force_update}`);
+
+export const getRecommendAPI = (type:string) =>
+    instance.get(`/recommend?type=${type}`);

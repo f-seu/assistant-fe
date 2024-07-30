@@ -36,7 +36,7 @@ export default defineConfig({
     server: {
       proxy: {
         '/api': { // 匹配请求路径，
-          target: 'http://127.0.0.1:8000/', // 代理的目标地址
+          target: 'http://124.223.181.152:7018/', // 代理的目标地址
           changeOrigin: true,
         },
       }
