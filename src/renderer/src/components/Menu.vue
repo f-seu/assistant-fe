@@ -22,10 +22,10 @@
           </el-menu-item>
         </router-link>
 
-        <router-link to="/recommand">
-          <el-menu-item index="recommand">
+        <router-link to="/recommend">
+          <el-menu-item index="recommend">
             <el-icon>
-              <RecommandIcon />
+              <RecommendIcon />
             </el-icon>
             <template #title>推荐</template>
           </el-menu-item>
@@ -38,7 +38,7 @@
 import { ref } from 'vue'
 import ChatIcon from '@assets/icons/chat.svg'
 import CalenderIcon from '@assets/icons/calender.svg'
-import RecommandIcon from '@assets/icons/recommand.svg'
+import RecommendIcon from '@assets/icons/recommend.svg'
 
 const menuWidth = ref('64')
 </script>

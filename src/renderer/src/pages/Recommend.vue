@@ -20,6 +20,24 @@
           </div>
         </el-col>
       </el-row>
+      <el-row class="music-container">
+        <el-col :span="24">
+          <h2>音乐推荐</h2>
+          <div class="carousel-wrapper">
+            <el-carousel :autoplay="false" arrow="always" height="500px">
+              <el-carousel-item v-for="item in movies" :key="item.id" class="carousel-item">
+                <div class="image-container">
+                  <a :href="item.url" target="_blank"><img :src="item.poster" class="movie-poster"></a>
+                </div>
+                <div class="text-container">
+                  <h3 class="movie-title">{{ item.title }}</h3>
+                  <h4 class="movie-reason">{{ item.reason }}</h4>
+                </div>
+              </el-carousel-item>
+            </el-carousel>
+          </div>
+        </el-col>
+      </el-row>
     </el-scrollbar>
   </el-main>
 </template>
@@ -30,7 +48,7 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import { getRecommendAPI } from '@renderer/request/api';
 import { ElNotification } from 'element-plus'
 
-const wsUrl = import.meta.env.VITE_RECOMMAND_WS_URL;
+const wsUrl = import.meta.env.VITE_WS_BASE_URL+"/recommend";
 let websocket: WebSocket | null = null;
 const connectionStatus = ref('Disconnected');
 const message = ref('');

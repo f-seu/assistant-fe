@@ -22,9 +22,9 @@ const routes = [
     component: () => import('@pages/Calender.vue')
   },
   {
-    path: '/recommand',
-    name: 'recommand',
-    component: () => import('@pages/Recommand.vue')
+    path: '/recommend',
+    name: 'recommend',
+    component: () => import('@pages/Recommend.vue')
   }
 ]
 // 路由

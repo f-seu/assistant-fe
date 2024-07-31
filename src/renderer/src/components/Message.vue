@@ -24,64 +24,67 @@ import { watch, ref, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useChatStore } from '@store/chat';
 import { getMessageAPI, newChatAPI } from "@renderer/request/api";
+import { ElNotification } from 'element-plus'
 
 const store = useChatStore();
 const { chatItems, messages, selectedChatId } = storeToRefs(store);
 const inputMessage = ref<string>("");
 const sendLoading = ref<boolean>(false);
 
-const sendMessage = (messageContent: string) => {
-  messages.value.push({ id: Date.now(), content: messageContent, role: "user" });
-  fetch("/api/chat-message/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      chatid: selectedChatId.value,
-      message: messageContent,
-    }),
-  })
-    .then((response) => {
-      if (response.body === null) {
-        throw new Error("Response body is null");
-      }
-      const index = messages.value.push({ id: Date.now(), content: "", role: "assistant" }) - 1;
-      const reader = response.body.getReader();
-      return new ReadableStream({
-        start(controller) {
-          function push() {
-            reader.read().then(({ done, value }) => {
-              if (done) {
-                controller.close();
-                sendLoading.value = false;
-                return;
-              }
-              const text = new TextDecoder("utf-8").decode(value);
-              processText(text,index);
-              push();
-            });
-          }
-          push();
-        }
-      });
-    })
-    .catch((err) => {
-      alert("发送消息失败：" + err.message);
-    });
 
+const wsUrl = import.meta.env.VITE_WS_BASE_URL + "/chat";
+const websocket = new WebSocket(wsUrl);
+
+websocket.onmessage = (event) => {
+  if(sendLoading.value)
+  {
+    inputMessage.value = "";
+    sendLoading.value = false;
+    messages.value.push({ id: Date.now(), content: "", role: "assistant" });
+  }
+  const index = messages.value.length - 1;
+  console.log("bbb",index)
+  const data = JSON.parse(event.data);
+  if ('msg' in data) {
+    ElNotification({
+      title: '发送失败',
+      message: '发送失败:' + data['msg'],
+      type: 'error',
+    });
+    return;
+  }
+  console.log(data);
+  messages.value[index].content += data['text'];
+  console.log(messages.value)
+  
+}
+
+websocket.onerror = (error) => {
+  ElNotification({
+    title: 'ws连接中断',
+    message: 'ws连接中断:' + error,
+    type: 'error',
+  });
 };
 
-const processText = (text, index) => {
+websocket.onclose = () => {
+  console.log('对话结束.');
   inputMessage.value = "";
-  const lines = text.split("\n\n");
-  lines.forEach(line => {
-    if (line.startsWith("data: ")) {
-      const messageResp = JSON.parse(line.slice(6));
-      messages.value[index].content += messageResp.text;
-    }
-  });
-}
+  sendLoading.value = false;
+};
+
+
+const sendMessage = (messageContent: string) => {
+  messages.value.push({ id: Date.now(), content: messageContent, role: "user" });
+  websocket.send(JSON.stringify({
+    "chatid": selectedChatId.value,
+    "message": messageContent,
+  }));
+  
+};
+
+
+
 const handleSendMessage = () => {
   if (sendLoading.value) {
     return;
