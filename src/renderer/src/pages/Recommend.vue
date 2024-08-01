@@ -6,7 +6,8 @@
         <h3 class="update-time">更新于 {{ appUpdateAt }}</h3>
         <el-row class="content-row">
           <el-col v-for="app in apps" :key="app.id" :span="10" class="app-col">
-            <img v-if="appNameToIcon[app.name]" :src="getIconPath(app.name)" :alt="app.name" class="app-icon" />
+            <img v-if="appNameToIcon[app.name]" :src="getIconPath(app.name)" :alt="app.name" class="app-icon"
+              @click="openApp(app.exec_command)" />
             <div>{{ app.name }}</div>
             <div>{{ app.reason }}</div>
           </el-col>
@@ -74,7 +75,7 @@ import vscodeIcon from '../assets/app-icons/vscode.png';
 const appNameToIcon = {
   'qq': qqIcon,
   '飞书': feishuIcon,
-  'vscode':vscodeIcon,
+  'vscode': vscodeIcon,
 }
 
 
@@ -120,6 +121,11 @@ function initWebSocket() {
   };
 }
 
+const openApp = (execCommand) => {
+  console.log("run command in Recommend.vue", execCommand);
+  const [command, ...args] = execCommand.split(' ');
+  window.electronAPI.runCommand(command, args);
+};
 interface App {
   id: number;
   name: string;

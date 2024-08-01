@@ -2,7 +2,7 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-
+import { spawn } from 'child_process'
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -51,6 +51,33 @@ app.whenReady().then(() => {
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
+
+  ipcMain.on('run-command', (_event, command,args) => {
+    console.log('run-command in main', command,args)
+    const child = spawn(command,args, {
+      detached: true, // Allow the command to run independently
+      stdio: ['ignore', 'pipe', 'pipe'], // Enable stdout and stderr pipes
+    });
+    child.on('error', (error) => {
+      console.error('Failed to start subprocess:', error);
+    });
+
+    child.stdout.on('data', (data) => {
+      console.log(`stdout: ${data}`);
+    });
+  
+    // Capture stderr
+    child.stderr.on('data', (data) => {
+      console.error(`stderr: ${data}`);
+    });
+  
+    child.on('error', (error) => {
+      console.error('Failed to start subprocess:', error);
+    });
+  
+    child.unref(); // Unreference the child process to allow the parent to exit
+
+  })
 
   createWindow()
 
