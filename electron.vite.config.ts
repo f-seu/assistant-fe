@@ -23,6 +23,7 @@ export default defineConfig({
         '@store': resolve('src/renderer/src/store'),
       }
     },
+    publicDir: resolve(__dirname, 'resources'), // 配置 Vite 的 public 目录
     plugins: [
       vue(),
       AutoImport({

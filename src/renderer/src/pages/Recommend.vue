@@ -1,10 +1,22 @@
 <template>
   <el-main class="main-container">
     <el-scrollbar>
+      <el-row class="app-container">
+        <h2>应用推荐</h2>
+        <h3 class="update-time">更新于 {{ appUpdateAt }}</h3>
+        <el-row class="content-row">
+          <el-col v-for="app in apps" :key="app.id" :span="10" class="app-col">
+            <img v-if="appNameToIcon[app.name]" :src="getIconPath(app.name)" :alt="app.name" class="app-icon" />
+            <div>{{ app.name }}</div>
+            <div>{{ app.reason }}</div>
+          </el-col>
+        </el-row>
+      </el-row>
       <!-- 电影推荐 -->
       <el-row class="movie-container">
         <el-col :span="24">
           <h2>电影推荐</h2>
+          <h3 class="update-time">更新于 {{ movieUpdateAt }}</h3>
           <div class="carousel-wrapper">
             <el-carousel :autoplay="false" arrow="always" height="500px">
               <el-carousel-item v-for="item in movies" :key="item.id" class="carousel-item">
@@ -23,9 +35,10 @@
       <el-row class="music-container">
         <el-col :span="24">
           <h2>音乐推荐</h2>
+          <h3 class="update-time">更新于 {{ musicUpdateAt }}</h3>
           <div class="carousel-wrapper">
             <el-carousel :autoplay="false" arrow="always" height="500px">
-              <el-carousel-item v-for="item in movies" :key="item.id" class="carousel-item">
+              <el-carousel-item v-for="item in musics" :key="item.id" class="carousel-item">
                 <div class="image-container">
                   <a :href="item.url" target="_blank"><img :src="item.poster" class="movie-poster"></a>
                 </div>
@@ -48,10 +61,27 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import { getRecommendAPI } from '@renderer/request/api';
 import { ElNotification } from 'element-plus'
 
-const wsUrl = import.meta.env.VITE_WS_BASE_URL+"/recommend";
+const wsUrl = import.meta.env.VITE_WS_BASE_URL + "/recommend";
 let websocket: WebSocket | null = null;
 const connectionStatus = ref('Disconnected');
-const message = ref('');
+const appUpdateAt = ref('');
+const movieUpdateAt = ref('');
+const musicUpdateAt = ref('');
+
+import qqIcon from '../assets/app-icons/qq.png';
+import feishuIcon from '../assets/app-icons/feishu.png';
+import vscodeIcon from '../assets/app-icons/vscode.png';
+const appNameToIcon = {
+  'qq': qqIcon,
+  '飞书': feishuIcon,
+  'vscode':vscodeIcon,
+}
+
+
+const getIconPath = (appName) => {
+  const icon = appNameToIcon[appName];
+  return icon;
+};
 
 function initWebSocket() {
   websocket = new WebSocket(wsUrl);
@@ -66,7 +96,11 @@ function initWebSocket() {
   };
 
   websocket.onmessage = (event) => {
-    message.value = event.data;
+    const data = JSON.parse(event.data);
+    console.log(data)
+    apps.value = data.content;
+    appUpdateAt.value = formatTime(data.create_at);
+
   };
 
   websocket.onerror = (error) => {
@@ -75,7 +109,9 @@ function initWebSocket() {
       message: 'ws连接中断，正在尝试重新连接:' + error,
       type: 'error',
     });
-    initWebSocket();
+    setTimeout(() => {
+      initWebSocket();
+    }, 2000);
   };
 
   websocket.onclose = () => {
@@ -87,13 +123,18 @@ function initWebSocket() {
 interface App {
   id: number;
   name: string;
-  description: string;
+  reason: string;
+  exec_command: string;
+  path: string;
+  icon: string;
 }
 
 interface Music {
   id: number;
   title: string;
+  poster: string;
   url: string;
+  reason: string;
 }
 
 interface Movie {
@@ -121,7 +162,8 @@ const getMusicRecommend = async () => {
         });
         return;
       }
-      musics.value = res.data;
+      musics.value = res.data['data']['content'];
+      musicUpdateAt.value = formatTime(res.data['data']['create_at']);
     });
   } catch (error) {
     console.error(error);
@@ -142,16 +184,23 @@ const getMovieRecommend = async () => {
         return;
       }
       movies.value = res.data['data']['content'];
-      console.log(movies.value);
+      movieUpdateAt.value = formatTime(res.data['data']['create_at']);
     });
   } catch (error) {
     console.error(error);
   }
 };
-
+const formatTime = (isoString) => {
+  const date = new Date(isoString);
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  return `${hours}:${minutes}:${seconds}`;
+}
 onMounted(() => {
   initWebSocket();
   getMovieRecommend();
+  getMusicRecommend();
 });
 
 onUnmounted(() => {
@@ -166,15 +215,69 @@ onUnmounted(() => {
   padding: 20px;
   width: 100%;
   box-sizing: border-box;
-  background-color: lightgray;
+  background-color: rgb(255, 255, 255);
+}
+
+.app-container {
+  width: 100%;
+  text-align: center;
+  background-color: rgb(239, 236, 236);
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title-row {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.update-time {
+  font-size: 14px;
+  color: #666;
+}
+
+.content-row {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.app-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px;
+}
+
+.app-icon {
+  height: 50px;
+  margin: 10px;
 }
 
 .movie-container {
+  margin-top: 20px;
   width: 100%;
   text-align: center;
-  background-color: white;
+  background-color: rgb(239, 236, 236);
   padding: 20px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.music-container {
+  margin-top: 20px;
+  width: 100%;
+  text-align: center;
+  background-color: rgb(239, 236, 236);
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
 }
 
@@ -198,17 +301,17 @@ onUnmounted(() => {
 }
 
 .image-container {
-  width: 100%; /* 设置容器宽度 */
+  width: 100%;
   display: flex;
-  justify-content: center; /* 图片水平居中 */
+  justify-content: center;
 }
 
 .movie-poster {
   width: auto;
-  max-width: 100%; /* 避免图片超出容器 */
-  max-height: 300px; /* 限制图片最大高度 */
+  max-width: 100%;
+  max-height: 300px;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .text-container {
@@ -225,5 +328,10 @@ onUnmounted(() => {
   font-size: 18px;
   color: #666;
   margin: 10px 0;
+}
+
+.app-icon {
+  height: 50px;
+  margin: 10px;
 }
 </style>
