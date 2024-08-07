@@ -4,7 +4,8 @@
       <el-scrollbar class="message-list">
         <div v-for="item in messages" :key="item.id" class="message-content"
           :class="{ 'is-user': item.role == 'user', 'is-assistant': item.role != 'user' }">
-          <div class="message-box">{{ item.content }}</div>
+          <div class="message-box" v-html="parseMarkdown(item.content)"></div>
+
         </div>
       </el-scrollbar>
     </el-row>
@@ -25,6 +26,7 @@ import { storeToRefs } from "pinia";
 import { useChatStore } from '@store/chat';
 import { getMessageAPI, newChatAPI } from "@renderer/request/api";
 import { ElNotification } from 'element-plus'
+import MarkdownIt from 'markdown-it';
 
 const store = useChatStore();
 const { chatItems, messages, selectedChatId } = storeToRefs(store);
@@ -73,6 +75,11 @@ websocket.onclose = () => {
   sendLoading.value = false;
 };
 
+const md = new MarkdownIt();
+
+const parseMarkdown = (content) => {
+  return md.render(content);
+};
 
 const sendMessage = (messageContent: string) => {
   messages.value.push({ id: Date.now(), content: messageContent, role: "user" });

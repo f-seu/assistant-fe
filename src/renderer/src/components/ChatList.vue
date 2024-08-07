@@ -10,6 +10,8 @@
           <el-tooltip :content="item.name" placement="top">
             <div>{{ truncatedName(item.name) }}</div>
           </el-tooltip>
+          <el-button class="delete-button" @click.stop="deleteChat(item.id)"><el-icon><Delete /></el-icon></el-button>
+
         </el-row>
       </ul>
     </el-scrollbar>
@@ -22,9 +24,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { chatListAPI, chatNumAPI } from "@renderer/request/api";
+import { chatListAPI, chatNumAPI, deleteChatAPI } from "@renderer/request/api";
 import { useChatStore } from '@store/chat';
 import { storeToRefs } from "pinia";
+import { ElNotification } from 'element-plus'
 
 const store = useChatStore();
 const { chatItems, selectedChatId } = storeToRefs(store);
@@ -68,6 +71,27 @@ const handlePageChange = (page) => {
 const newChat = () => {
   selectedChatId.value = 0;
 };
+const deleteChat = (chatId: number) => {
+  if (confirm("确定要删除这条聊天吗？")) {
+    deleteChatAPI(chatId)
+      .then(() => {
+        ElNotification({
+          title: '删除成功',
+          message: '删除成功',
+          type: 'success',
+        })
+        loadChatList(); // 重新加载聊天列表
+        selectedChatId.value = 0;
+      })
+      .catch((err) => {
+        ElNotification({
+          title: '删除失败',
+          message: '删除失败，请稍后再试:' + err,
+          type: 'error',
+        })
+      });
+  }
+};
 const truncatedName = (name: string) => {
   if (name.length > 10) {
     return name.slice(0, 10) + '...';
@@ -102,17 +126,20 @@ onMounted(() => {
   list-style: none;
   overflow: auto;
 }
-.new-chat-container{
+
+.new-chat-container {
   display: flex;
-  justify-content:center;
-  margin-top:10px;
-  margin-bottom:10px;
+  justify-content: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
   height: 5vh;
 }
-.pagination-container{
+
+.pagination-container {
   display: flex;
-  justify-content:center;
+  justify-content: center;
 }
+
 .chat-list {
   padding: 0;
   margin: 0;
@@ -128,5 +155,22 @@ onMounted(() => {
   margin: 10px;
   color: var(--el-color-primary);
   cursor: pointer;
+}
+
+.delete-button {
+  margin-left: auto; /* 保持图标按钮在右侧 */
+  color: #f56c6c; /* 红色图标 */
+  border: none; /* 无边框 */
+  background: transparent !important; /* 重要：设置背景透明 */
+  padding: 0; /* 去除内边距 */
+}
+
+.delete-button:hover {
+  background: rgba(245, 108, 108, 0.1) !important; /* 悬停时轻微显示红色背景 */
+}
+
+.delete-button:focus {
+  outline: none; /* 移除焦点时的轮廓线 */
+  background: transparent !important; /* 确保焦点状态下背景透明 */
 }
 </style>
