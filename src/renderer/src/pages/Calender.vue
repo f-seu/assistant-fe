@@ -6,6 +6,7 @@
                     <p :class="data.isSelected ? 'is-selected' : ''">
                         {{ data.day.split('-').slice(1).join('-') }}
                         {{ data.isSelected ? '✔️' : '' }}
+                        <div v-if="hasCalendarDays.includes( data.date.getDate() )"> 今日有日程 </div>
                     </p>
                 </template>
             </el-calendar>
@@ -36,9 +37,9 @@
 
 <script lang="ts" setup>
 
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { ElNotification } from 'element-plus'
-import { getPlanAPI, getCalendarAPI, updateCalendarAPI } from '@renderer/request/api';
+import { getPlanAPI, getCalendarAPI, updateCalendarAPI,getHasCalendarAPI } from '@renderer/request/api';
 import markdownit from 'markdown-it'
 
 const md = markdownit();
@@ -46,7 +47,11 @@ const calendarContent = ref("");
 const plan = ref("");
 const planRender = ref("");
 const planVisible = ref(false);
-const selectDate = ref(new Date())
+const selectDate = ref(new Date());
+const selectMonth = computed(() => {
+      return selectDate.value.getMonth();
+    });
+const hasCalendarDays = ref<number[]>([]);
 
 const getPlan = (forceUpdate) => {
     const date = selectDate.value.toLocaleDateString().split('/');
@@ -155,12 +160,46 @@ const getCalendarContent = (date) => {
         });
 }
 
+const getHasCalender = (year,month) => {
+    console.log("get has")
+    getHasCalendarAPI(
+        year,
+        month
+    )
+        .then((res) => {
+            const code = res.data['code'];
+            if (code == 0) {
+                hasCalendarDays.value = res.data['data'].map(item => item.day);
+                console.log(hasCalendarDays);
+            } else {
+                ElNotification({
+                    title: '获取失败',
+                    message: '获取本月日程失败，请稍后再试:' + code,
+                    type: 'error',
+                })
+            }
+        })
+        .catch((err) => {
+            ElNotification({
+                title: '获取失败',
+                message: '获取本月日程失败，请稍后再试:' + err,
+                type: 'error',
+            })
+        });
+}
 watch(selectDate, (newVal) => {
     const date = newVal.toLocaleDateString().split('/');
     console.log(newVal.toLocaleDateString());
     getCalendarContent(date);
+});
+
+watch(selectMonth, (newVal) => {
+    const year = selectDate.value.getFullYear();
+    const month = newVal;
+    getHasCalender(year,month+1);
 
 });
+
 
 watch(plan, (newVal) => {
     newVal = newVal.replace(/\\n/g, "\n");
@@ -203,6 +242,7 @@ const updateCalendar = () => {
 onMounted(() => {
     const date = selectDate.value.toLocaleDateString().split('/');
     getCalendarContent(date);
+    getHasCalender(selectDate.value.getFullYear(),selectDate.value.getMonth()+1);
 });
 
 </script>
@@ -210,6 +250,10 @@ onMounted(() => {
 <style scoped>
 .is-selected {
     color: #1989fa;
+}
+.has-calendar {
+    background-color: #e6f7ff;
+    border-radius: 50%;
 }
 
 .plan-content * {
@@ -233,6 +277,7 @@ onMounted(() => {
     flex-direction: column;
     align-items: center;
 }
+
 
 </style>
 

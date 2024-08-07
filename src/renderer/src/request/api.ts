@@ -21,7 +21,8 @@ export const newChatAPI =
 
 export const getCalendarAPI = (year: number, month: number, day: number) => 
     instance.get(`/calendar?year=${year}&month=${month}&day=${day}`);
-
+export const getHasCalendarAPI = (year: number, month: number) => 
+    instance.get(`/has-calendar?year=${year}&month=${month}`);
 export const updateCalendarAPI = (year: number, month: number, day: number, content: string) => 
     instance.put(`/calendar/`, { "year":year, "month":month, "day":day, "content":content });
 

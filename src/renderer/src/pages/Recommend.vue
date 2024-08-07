@@ -72,10 +72,17 @@ const musicUpdateAt = ref('');
 import qqIcon from '../assets/app-icons/qq.png';
 import feishuIcon from '../assets/app-icons/feishu.png';
 import vscodeIcon from '../assets/app-icons/vscode.png';
+import chromeIcon from '../assets/app-icons/chrome.png'
+import wechatIcon from '../assets/app-icons/wechat.png'
+import notebookIcon from '../assets/app-icons/notebook.png'
+
 const appNameToIcon = {
   'qq': qqIcon,
   '飞书': feishuIcon,
   'vscode': vscodeIcon,
+  '谷歌浏览器':chromeIcon,
+  '微信':wechatIcon,
+  '便利贴':notebookIcon,
 }
 
 
