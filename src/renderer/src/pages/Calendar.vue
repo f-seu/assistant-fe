@@ -160,7 +160,7 @@ const getCalendarContent = (date) => {
         });
 }
 
-const getHasCalender = (year,month) => {
+const getHasCalendar = (year,month) => {
     console.log("get has")
     getHasCalendarAPI(
         year,
@@ -196,7 +196,7 @@ watch(selectDate, (newVal) => {
 watch(selectMonth, (newVal) => {
     const year = selectDate.value.getFullYear();
     const month = newVal;
-    getHasCalender(year,month+1);
+    getHasCalendar(year,month+1);
 
 });
 
@@ -242,7 +242,7 @@ const updateCalendar = () => {
 onMounted(() => {
     const date = selectDate.value.toLocaleDateString().split('/');
     getCalendarContent(date);
-    getHasCalender(selectDate.value.getFullYear(),selectDate.value.getMonth()+1);
+    getHasCalendar(selectDate.value.getFullYear(),selectDate.value.getMonth()+1);
 });
 
 </script>

@@ -17,9 +17,9 @@ const routes = [
     component: () => import('@pages/Chat.vue')
   },
   {
-    path: '/calender',
-    name: 'calender',
-    component: () => import('@pages/Calender.vue')
+    path: '/calendar',
+    name: 'calendar',
+    component: () => import('@pages/Calendar.vue')
   },
   {
     path: '/recommend',

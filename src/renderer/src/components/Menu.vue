@@ -13,10 +13,10 @@
           </el-menu-item>
         </router-link>
 
-        <router-link to="/calender">
-          <el-menu-item index="calender">
+        <router-link to="/calendar">
+          <el-menu-item index="calendar">
             <el-icon>
-              <CalenderIcon />
+              <CalendarIcon />
             </el-icon>
             <template #title>日程</template>
           </el-menu-item>
@@ -37,7 +37,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import ChatIcon from '@assets/icons/chat.svg'
-import CalenderIcon from '@assets/icons/calender.svg'
+import CalendarIcon from '@assets/icons/calendar.svg'
 import RecommendIcon from '@assets/icons/recommend.svg'
 
 const menuWidth = ref('64')

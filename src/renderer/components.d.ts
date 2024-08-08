@@ -13,6 +13,7 @@ declare module 'vue' {
     ElAudio: typeof import('element-plus/es')['ElAudio']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCalendar: typeof import('element-plus/es')['ElCalendar']
+    ElCalender: typeof import('element-plus/es')['ElCalender']
     ElCard: typeof import('element-plus/es')['ElCard']
     ElCarousel: typeof import('element-plus/es')['ElCarousel']
     ElCarouselItem: typeof import('element-plus/es')['ElCarouselItem']
