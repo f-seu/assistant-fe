@@ -222,6 +222,7 @@ const updateCalendar = () => {
                     message: '更新成功',
                     type: 'success',
                 })
+                getHasCalendar(selectDate.value.getFullYear(),selectDate.value.getMonth()+1);
             } else {
                 ElNotification({
                     title: '更新失败',

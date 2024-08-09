@@ -7,11 +7,12 @@ function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
-    height: 670,
+    height: 750,
     show: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
+      webSecurity: false, // 禁用同源策略
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
     }

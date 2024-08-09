@@ -125,6 +125,9 @@ function initWebSocket() {
   websocket.onclose = () => {
     connectionStatus.value = 'Disconnected';
     console.log('WebSocket connection closed.');
+    setTimeout(() => {
+      initWebSocket();
+    }, 2000);
   };
 }
 
