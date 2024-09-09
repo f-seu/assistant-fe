@@ -1,3 +1,8 @@
+<!-- 
+  Copyright (c) 2024, Li Yaning,Zu Yuankun/Southeast University
+  Licensed under the GPL3 License (see LICENSE file for details) 
+-->
+
 <template>
   <el-col :span="18" class="chat-container">
     <el-row class="message-list-container">

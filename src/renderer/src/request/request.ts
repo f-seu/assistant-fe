@@ -1,3 +1,8 @@
+/*
+  Copyright (c) 2024, Li Yaning,Zu Yuankun/Southeast University
+  Licensed under the GPL3 License (see LICENSE file for details) 
+*/
+
 import axios from 'axios'
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 // 创建axios实例
