@@ -9,6 +9,7 @@ import { ref } from 'vue'
 interface ChatItem {
   id: number;
   name: string;
+  created_at: string;
 }
 interface MessageItem {
   content: string;

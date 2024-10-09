@@ -97,7 +97,13 @@ const getIconPath = (appName) => {
   return icon;
 };
 
+let isReconnecting = false;  // Flag to prevent multiple reconnections
+
 function initWebSocket() {
+  if (websocket && websocket.readyState !== WebSocket.CLOSED) {
+    websocket.close();
+  }
+
   websocket = new WebSocket(wsUrl);
 
   websocket.onopen = () => {
@@ -107,14 +113,14 @@ function initWebSocket() {
       type: 'success',
     });
     connectionStatus.value = 'Connected';
+    isReconnecting = false;  // Reset reconnection flag on successful connection
   };
 
   websocket.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    console.log(data)
+    console.log(data);
     apps.value = data.content;
     appUpdateAt.value = formatTime(data.create_at);
-
   };
 
   websocket.onerror = (error) => {
@@ -123,19 +129,25 @@ function initWebSocket() {
       message: 'ws连接中断，正在尝试重新连接:' + error,
       type: 'error',
     });
-    setTimeout(() => {
-      initWebSocket();
-    }, 2000);
+    handleReconnect();  // Trigger reconnection logic
   };
 
   websocket.onclose = () => {
     connectionStatus.value = 'Disconnected';
     console.log('WebSocket connection closed.');
-    setTimeout(() => {
-      initWebSocket();
-    }, 2000);
+    handleReconnect();  // Trigger reconnection logic
   };
 }
+
+function handleReconnect() {
+  if (!isReconnecting) {  // Only attempt reconnect if not already reconnecting
+    isReconnecting = true;
+    setTimeout(() => {
+      initWebSocket();  // Attempt to reconnect after delay
+    }, 2000);
+  }
+}
+
 
 const openApp = (execCommand) => {
   console.log("run command in Recommend.vue", execCommand);

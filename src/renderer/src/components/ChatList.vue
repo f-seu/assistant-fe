@@ -13,7 +13,8 @@
       <ul class="chat-list">
         <el-row v-for="item in chatItems" :key="item.id" class="chat-list-item" @click="handleItemClick(item)">
           <el-tooltip :content="item.name" placement="top">
-            <div>{{ truncatedName(item.name) }}</div>
+            <div>{{ truncatedName(item.name) }}<br>{{ formatDateTime(item.created_at) }}</div>
+            <div></div>
           </el-tooltip>
           <el-button class="delete-button" @click.stop="deleteChat(item.id)"><el-icon><Delete /></el-icon></el-button>
 
@@ -58,6 +59,7 @@ const loadChatList = () => {
   )
     .then((res) => {
       chatItems.value = res.data['data'];
+      console.log(chatItems.value);
     })
     .catch((err) => {
       alert("请求消息列表失败：" + err.message);
@@ -111,6 +113,19 @@ const loadAll = () => {
 onMounted(() => {
   loadAll();
 });
+const formatDateTime = (dateInput: string | Date): string => {
+    const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始，所以加1
+    const day = String(date.getDate()).padStart(2, '0');
+
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
 </script>
 
 <style>

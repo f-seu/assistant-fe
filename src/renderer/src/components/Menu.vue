@@ -9,6 +9,14 @@
     <el-aside :width="menuWidth">
       <!-- 侧边栏菜单区域 -->
       <el-menu id="menu" default-active="chat">
+        <router-link to="/home">
+          <el-menu-item index="home">
+            <el-icon>
+              <RecommendIcon />
+            </el-icon>
+            <template #title>主页</template>
+          </el-menu-item>
+        </router-link>
         <router-link to="/chat">
           <el-menu-item index="chat">
             <el-icon>
@@ -35,6 +43,7 @@
             <template #title>推荐</template>
           </el-menu-item>
         </router-link>
+        
       </el-menu>
     </el-aside>
   </el-container>
