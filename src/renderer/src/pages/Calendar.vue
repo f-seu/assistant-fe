@@ -5,46 +5,46 @@
 
 <template>
     <el-row class="calendar-container">
-        <el-scrollbar>
-            <el-calendar v-model="selectDate">
-                <template #date-cell="{ data }">
-                    <p :class="data.isSelected ? 'is-selected' : ''">
-                        {{ data.day.split('-').slice(1).join('-') }}
-                        {{ data.isSelected ? '✔️' : '' }}
-                        <div v-if="hasCalendarDays.includes( data.date.getDate() )"> 今日有日程 </div>
-                    </p>
-                </template>
-            </el-calendar>
-        </el-scrollbar>
-    </el-row>
-    <el-row class="bottom-container">
-        <el-col :span="20" class="input-container">
-            <el-input v-model="calendarContent" type="textarea" rows="6"></el-input>
-        </el-col>
-        <el-col :span="2" class="button-container">
-            <el-button type="primary" @click="updateCalendar">更新</el-button>
-            <el-button type="primary" @click="getPlan(false)">规划日程</el-button>
-        </el-col>
-    </el-row>
-    <el-dialog v-model="planVisible" title="规划后日程" width="500">
-        <div class="plan-content" v-html="planRender"></div>
-        <template #footer>
-            <div class="dialog-footer">
-                <el-button class="button" @click="planVisible = false">关闭</el-button>
-                <el-button class="button" type="primary" @click="getPlan(true)">
-                    重新规划
-                </el-button>
+      <!-- 左侧容器 -->
+      <el-col :span="12" class="left-container">
+        <!-- 日历组件 -->
+        <el-calendar v-model="selectDate">
+          <template #date-cell="{ data }">
+            <div :class="['custom-date', { 'is-selected': data.isSelected }]">
+              {{ data.day.split('-').slice(1).join('-') }}
+              <div v-if="hasCalendarDays.includes(data.date.getDate())"> ✔️ </div>
             </div>
-        </template>
-    </el-dialog>
-</template>
+          </template>
+        </el-calendar>
+      </el-col>
+      <!-- 右侧容器 -->
+      <el-col :span="12" class="right-container">
+        <!-- 日程输入和更新 -->
+        <el-form label-position="top" class="plan-form">
+          <el-form-item label="日程内容">
+            <el-input v-model="calendarContent" type="textarea" rows="8"></el-input>
+          </el-form-item>
+          <!-- 按钮组 -->
+          <div class="button-group">
+            <el-button type="primary" @click="updateCalendar">更新日程</el-button>
+            <el-button type="primary" @click="getPlan(true)">规划日程</el-button>
+          </div>
+        </el-form>
+        <!-- 规划内容显示 -->
+        <div class="plan-section">
+          <h3 class="plan-title">规划后日程</h3>
+          <div class="plan-content" v-html="planRender"></div>
+        </div>
+      </el-col>
+    </el-row>
+  </template>
 
 
 <script lang="ts" setup>
 
 import { computed, onMounted, ref, watch } from 'vue';
 import { ElNotification } from 'element-plus'
-import { getPlanAPI, getCalendarAPI, updateCalendarAPI,getHasCalendarAPI } from '@renderer/request/api';
+import { getPlanAPI, getCalendarAPI, updateCalendarAPI, getHasCalendarAPI } from '@renderer/request/api';
 import markdownit from 'markdown-it'
 
 const md = markdownit();
@@ -54,8 +54,8 @@ const planRender = ref("");
 const planVisible = ref(false);
 const selectDate = ref(new Date());
 const selectMonth = computed(() => {
-      return selectDate.value.getMonth();
-    });
+    return selectDate.value.getMonth();
+});
 const hasCalendarDays = ref<number[]>([]);
 
 const getPlan = (forceUpdate) => {
@@ -165,7 +165,7 @@ const getCalendarContent = (date) => {
         });
 }
 
-const getHasCalendar = (year,month) => {
+const getHasCalendar = (year, month) => {
     console.log("get has")
     getHasCalendarAPI(
         year,
@@ -201,7 +201,7 @@ watch(selectDate, (newVal) => {
 watch(selectMonth, (newVal) => {
     const year = selectDate.value.getFullYear();
     const month = newVal;
-    getHasCalendar(year,month+1);
+    getHasCalendar(year, month + 1);
 
 });
 
@@ -227,7 +227,7 @@ const updateCalendar = () => {
                     message: '更新成功',
                     type: 'success',
                 })
-                getHasCalendar(selectDate.value.getFullYear(),selectDate.value.getMonth()+1);
+                getHasCalendar(selectDate.value.getFullYear(), selectDate.value.getMonth() + 1);
             } else {
                 ElNotification({
                     title: '更新失败',
@@ -248,43 +248,63 @@ const updateCalendar = () => {
 onMounted(() => {
     const date = selectDate.value.toLocaleDateString().split('/');
     getCalendarContent(date);
-    getHasCalendar(selectDate.value.getFullYear(),selectDate.value.getMonth()+1);
+    getHasCalendar(selectDate.value.getFullYear(), selectDate.value.getMonth() + 1);
 });
 
 </script>
 
 <style scoped>
-.is-selected {
-    color: #1989fa;
-}
-.has-calendar {
-    background-color: #e6f7ff;
-    border-radius: 50%;
-}
-
-.plan-content * {
-    text-align: left;
-}
-
 .calendar-container {
-    margin: 10px;
-
-}
-.bottom-container {
-    height: 20vh;
- 
-}
-.el-button{
-    margin-bottom: 10px;
-}
-.button-container {
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  padding: 20px;
 }
 
+.left-container,
+.right-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
 
+.custom-date {
+  text-align: center;
+}
+
+.is-selected {
+  color: #1989fa;
+}
+
+.plan-form {
+  margin-bottom: 20px;
+}
+
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.plan-section {
+  flex: 1;
+  border: 1px solid #ebeef5;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.plan-title {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.plan-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.el-button {
+  margin-top: 10px;
+}
 </style>
-
-

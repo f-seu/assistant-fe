@@ -86,9 +86,9 @@ const appNameToIcon = {
   'qq': qqIcon,
   '飞书': feishuIcon,
   'vscode': vscodeIcon,
-  '谷歌浏览器':chromeIcon,
-  '微信':wechatIcon,
-  '便利贴':notebookIcon,
+  '谷歌浏览器': chromeIcon,
+  '微信': wechatIcon,
+  '便利贴': notebookIcon,
 }
 
 

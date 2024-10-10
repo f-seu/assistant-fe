@@ -124,7 +124,7 @@ const handleSendMessage = () => {
           if (chatItems.value.length >= 10) {
             chatItems.value.pop();
           }
-          chatItems.value.unshift({ id: id, name: name });
+          chatItems.value.unshift({ id: id, name: name, created_at: new Date().toISOString() });
           selectedChatId.value = id;
           sendMessage(inputMessage.value);
         })
