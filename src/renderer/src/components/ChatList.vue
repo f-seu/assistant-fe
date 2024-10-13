@@ -179,13 +179,15 @@ const formatDateTime = (dateInput: string | Date): string => {
 
 .chat-list-item {
   display: flex;
-  height: 60px;
+  height: 65px;
   background: var(--el-color-primary-light-9);
   align-items: center;
   justify-content: center;
-  margin: 10px;
+  margin: 5px;
   color: var(--el-color-primary);
   cursor: pointer;
+  border-radius: 10px;
+  padding: 3px;
 }
 
 .delete-button {

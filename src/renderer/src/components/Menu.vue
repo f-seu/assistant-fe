@@ -2,67 +2,63 @@
   Copyright (c) 2024, Li Yaning,Zu Yuankun/Southeast University
   Licensed under the GPL3 License (see LICENSE file for details) 
 -->
-
 <template>
-  <el-container>
-    <!-- 侧边栏 -->
-    <el-aside :width="menuWidth">
-      <!-- 侧边栏菜单区域 -->
-      <el-menu id="menu" default-active="chat">
-        <router-link to="/home">
-          <el-menu-item index="home">
-            <el-icon>
-              <RecommendIcon />
-            </el-icon>
-            <template #title>主页</template>
-          </el-menu-item>
-        </router-link>
-        <router-link to="/chat">
-          <el-menu-item index="chat">
-            <el-icon>
-              <ChatIcon />
-            </el-icon>
-            <template #title>聊天</template>
-          </el-menu-item>
-        </router-link>
+  <div class="menu">
+    <div class="menu-item" :class="{ 'is-active': currentRoute === '/home' }" @click="navigateTo('/home')"  >
+      <div class="icon">
+          <ChatIcon />
+      </div>
+      <div>
+        主页
+      </div>
+    </div>
+    <div class="menu-item" :class="{ 'is-active': currentRoute === '/chat' }" @click="navigateTo('/chat')">
+      <div class="icon">
+          <ChatIcon />
+      </div>
+      <div>
+        聊天
+      </div>
+    </div>
+  </div>
 
-        <router-link to="/calendar">
-          <el-menu-item index="calendar">
-            <el-icon>
-              <CalendarIcon />
-            </el-icon>
-            <template #title>日程</template>
-          </el-menu-item>
-        </router-link>
 
-        <router-link to="/recommend">
-          <el-menu-item index="recommend">
-            <el-icon>
-              <RecommendIcon />
-            </el-icon>
-            <template #title>推荐</template>
-          </el-menu-item>
-        </router-link>
-        
-      </el-menu>
-    </el-aside>
-  </el-container>
 </template>
-<script lang="ts" setup>
-import { ref } from 'vue'
-import ChatIcon from '@assets/icons/chat.svg'
-import CalendarIcon from '@assets/icons/calendar.svg'
-import RecommendIcon from '@assets/icons/recommend.svg'
 
-const menuWidth = ref('64')
+
+<script lang="ts" setup>
+import { useRouter } from 'vue-router'
+import ChatIcon from '@assets/icons/chat.svg'
+import { ref } from 'vue';
+
+const currentRoute = ref("/home")
+
+const router = useRouter();
+
+function navigateTo(route) {
+  router.push(route);
+  currentRoute.value = route;
+}
 </script>
 
 <style scoped>
-#menu {
+.menu {
   min-height: 100vh;
-  padding-top: 20vh;
+  /* padding-top: 20vh; */
+  width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #f0f0f0;
+  background-color: #e4e9efa9;
+  border-radius: 50px;
 }
 
+.icon{
+  width: 40px;
+  height: 40px;
+}
 a {
   text-decoration: none;
 }
@@ -70,4 +66,20 @@ a {
 .router-link-active {
   text-decoration: none;
 }
+
+.menu-item {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  height: 30%;
+  width: 95%;
+}
+.is-active {
+  background-color: #409eff;
+  color: white;
+  border-radius: 10px;
+}
+
 </style>
