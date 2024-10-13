@@ -23,7 +23,7 @@
             <h3 class="calendar-content-title">日程内容</h3>
             <span v-if="calendarObj.userUpdate">更新于 {{ formatDateTime(calendarObj.updateAt) }}</span>
             <span v-else>今日未更新过日程</span>
-            <el-input v-model="calendarObj.content" type="textarea" rows="8"></el-input>
+            <el-input v-model="calendarObj.content" type="textarea" rows="4"></el-input>
             <!-- 按钮组 -->
             <div class="button-group">
                 <el-button type="primary" @click="updateCalendar">更新日程</el-button>
@@ -110,11 +110,13 @@ const getPlan = (showNotification) => {
                 planObj.update_at = "正在规划中";
             }
             else {
+                if (showNotification) {
                 ElNotification({
                     title: '获取失败',
                     message: data['msg'],
                     type: 'error',
-                })
+                    })
+                }
                 planInProgress.value = false;
                 planObj.content = "";
                 planObj.update_at = "暂无更新信息";
@@ -326,7 +328,7 @@ const formatDateTime = (dateInput: string | Date): string => {
 .calendar-container {
     padding: 20px;
 }
-
+fill
 .left-container,
 .right-container {
     display: flex;
@@ -360,6 +362,7 @@ const formatDateTime = (dateInput: string | Date): string => {
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    margin-top: 10px;
 }
 
 .plan-title {

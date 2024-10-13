@@ -10,14 +10,13 @@
       <Menu></Menu>
     </el-affix>
     <el-container class="main-container">
-      <el-main class="main-content" width="100vh">
-        <el-scrollbar>
+      <el-main class="main-content" height="100vh">
+        
           <router-view v-slot="{ Component }">
             <keep-alive>
               <component :is="Component" />
             </keep-alive>
           </router-view>
-        </el-scrollbar>
       </el-main>
     </el-container>
   </el-container>

@@ -5,20 +5,36 @@
 <template>
   <div class="menu">
     <div class="menu-item" :class="{ 'is-active': currentRoute === '/home' }" @click="navigateTo('/home')"  >
-      <div class="icon">
-          <ChatIcon />
+      <div  >
+          <HomeIcon :class="{ 'is-active-icon': currentRoute === '/home','deactive-icon':currentRoute!='/home' }"  />
       </div>
-      <div>
+      <h3>
         主页
-      </div>
+      </h3>
     </div>
     <div class="menu-item" :class="{ 'is-active': currentRoute === '/chat' }" @click="navigateTo('/chat')">
-      <div class="icon">
-          <ChatIcon />
-      </div>
       <div>
-        聊天
+          <ChatIcon   :class="{ 'is-active-icon': currentRoute === '/chat','deactive-icon':currentRoute!='/chat'  }"   />
       </div>
+      <h3>
+        聊天
+      </h3>
+    </div>
+    <div class="menu-item" :class="{ 'is-active': currentRoute === '/calendar' }" @click="navigateTo('/calendar')">
+      <div >
+          <CalendarIcon   :class="{ 'is-active-icon': currentRoute === '/calendar','deactive-icon':currentRoute!='/calendar'  }" />
+      </div>
+      <h3>
+       日程
+      </h3>
+    </div>
+    <div class="menu-item" :class="{ 'is-active': currentRoute === '/recommend' }" @click="navigateTo('/recommend')">
+      <div >
+          <RecommendIcon  :class="{ 'is-active-icon': currentRoute === '/recommend','deactive-icon':currentRoute!='/recommend'  }" />
+      </div>
+      <h3>
+        推荐
+      </h3>
     </div>
   </div>
 
@@ -28,7 +44,12 @@
 
 <script lang="ts" setup>
 import { useRouter } from 'vue-router'
+
+import HomeIcon from '@assets/icons/home.svg'
 import ChatIcon from '@assets/icons/chat.svg'
+import CalendarIcon from '@assets/icons/calendar.svg'
+import RecommendIcon from '@assets/icons/recommend.svg'
+
 import { ref } from 'vue';
 
 const currentRoute = ref("/home")
@@ -55,9 +76,17 @@ function navigateTo(route) {
   border-radius: 50px;
 }
 
-.icon{
-  width: 40px;
-  height: 40px;
+.deactive-icon{
+  width: 25px;
+  height: 25px;
+  fill:#aca6a6
+}
+
+
+.is-active-icon{
+  width: 25px;
+  height: 25px;
+  fill:#ffffff;
 }
 a {
   text-decoration: none;
@@ -73,8 +102,9 @@ a {
   text-align: center;
   align-items: center;
   justify-content: center;
-  height: 30%;
+  height: 100px;
   width: 95%;
+
 }
 .is-active {
   background-color: #409eff;
