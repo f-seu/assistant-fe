@@ -10,6 +10,7 @@ interface ChatItem {
   id: number;
   name: string;
   created_at: string;
+  message_num:number;
 }
 interface MessageItem {
   content: string;

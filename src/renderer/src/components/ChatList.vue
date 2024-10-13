@@ -12,12 +12,24 @@
     <el-scrollbar class="chat-list-container">
       <ul class="chat-list">
         <el-row v-for="item in chatItems" :key="item.id" class="chat-list-item" @click="handleItemClick(item)">
-          <el-tooltip :content="item.name" placement="top">
-            <div>{{ truncatedName(item.name) }}<br>{{ formatDateTime(item.created_at) }}</div>
-            <div></div>
-          </el-tooltip>
-          <el-button class="delete-button" @click.stop="deleteChat(item.id)"><el-icon><Delete /></el-icon></el-button>
-
+          <el-row class="title-row">
+            <el-col :span="22">
+              <el-tooltip :content="item.name" placement="top">
+                {{ truncatedName(item.name) }}
+              </el-tooltip>
+            </el-col>
+            <el-col :span="2">
+              <el-button class="delete-button" @click.stop="deleteChat(item.id)">
+                <el-icon>
+                  <Delete />
+                </el-icon>
+              </el-button>
+            </el-col>
+          </el-row>
+          <el-row class="foot-row">
+            <el-col :span="8" class="message_num">{{ item.message_num }}条消息</el-col>
+            <el-col :span="16" class="create_at">{{ formatDateTime(item.created_at) }}</el-col>
+          </el-row>
         </el-row>
       </ul>
     </el-scrollbar>
@@ -59,7 +71,6 @@ const loadChatList = () => {
   )
     .then((res) => {
       chatItems.value = res.data['data'];
-      console.log(chatItems.value);
     })
     .catch((err) => {
       alert("请求消息列表失败：" + err.message);
@@ -101,7 +112,7 @@ const deleteChat = (chatId: number) => {
 };
 const truncatedName = (name: string) => {
   if (name.length > 10) {
-    return name.slice(0, 10) + '...';
+    return name.slice(0,10) + '...';
   }
   return name;
 };
@@ -114,17 +125,17 @@ onMounted(() => {
   loadAll();
 });
 const formatDateTime = (dateInput: string | Date): string => {
-    const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+  const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
 
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始，所以加1
-    const day = String(date.getDate()).padStart(2, '0');
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始，所以加1
+  const day = String(date.getDate()).padStart(2, '0');
 
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const seconds = String(date.getSeconds()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
 
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
 }
 </script>
 
@@ -168,29 +179,62 @@ const formatDateTime = (dateInput: string | Date): string => {
 
 .chat-list-item {
   display: flex;
+  height: 60px;
+  background: var(--el-color-primary-light-9);
   align-items: center;
   justify-content: center;
-  height: 50px;
-  background: var(--el-color-primary-light-9);
   margin: 10px;
   color: var(--el-color-primary);
   cursor: pointer;
 }
 
 .delete-button {
-  margin-left: auto; /* 保持图标按钮在右侧 */
-  color: #f56c6c; /* 红色图标 */
-  border: none; /* 无边框 */
-  background: transparent !important; /* 重要：设置背景透明 */
-  padding: 0; /* 去除内边距 */
+  margin-left: auto;
+  /* 保持图标按钮在右侧 */
+  color: #f56c6c;
+  /* 红色图标 */
+  border: none;
+  /* 无边框 */
+  background: transparent !important;
+  /* 重要：设置背景透明 */
+  padding: 0;
+  /* 去除内边距 */
 }
 
 .delete-button:hover {
-  background: rgba(245, 108, 108, 0.1) !important; /* 悬停时轻微显示红色背景 */
+  background: rgba(245, 108, 108, 0.1) !important;
+  /* 悬停时轻微显示红色背景 */
 }
 
 .delete-button:focus {
-  outline: none; /* 移除焦点时的轮廓线 */
-  background: transparent !important; /* 确保焦点状态下背景透明 */
+  outline: none;
+  /* 移除焦点时的轮廓线 */
+  background: transparent !important;
+  /* 确保焦点状态下背景透明 */
+}
+
+.foot-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.create_at {
+  color: #666;
+  text-align: right;
+  font-size: 13px;
+}
+
+.message_num {
+  color: #666;
+  text-align: left;
+  font-size: 13px;
+}
+.title-row {
+  width: 100%;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

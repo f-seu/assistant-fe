@@ -32,8 +32,11 @@ export const getHasCalendarAPI = (year: number, month: number) =>
     instance.get(`/has-calendar?year=${year}&month=${month}`);
 export const updateCalendarAPI = (year: number, month: number, day: number, content: string) =>
     instance.put(`/calendar/`, { "year": year, "month": month, "day": day, "content": content });
-export const getPlanAPI = (year: number, month: number, day: number, force_update: boolean) =>
-    instance.get(`/plan?year=${year}&month=${month}&day=${day}&force_update=${force_update}`);
+export const getPlanAPI = (year: number, month: number, day: number) =>
+    instance.get(`/plan?year=${year}&month=${month}&day=${day}`);
+
+export const updatePlanAPI = (year: number, month: number, day: number) =>
+    instance.put(`/plan/`, { "year": year, "month": month, "day": day });
 
 
 

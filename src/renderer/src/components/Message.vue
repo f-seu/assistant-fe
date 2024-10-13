@@ -124,7 +124,7 @@ const handleSendMessage = () => {
           if (chatItems.value.length >= 10) {
             chatItems.value.pop();
           }
-          chatItems.value.unshift({ id: id, name: name, created_at: new Date().toISOString() });
+          chatItems.value.unshift({ id: id, name: name, created_at: new Date().toISOString(),message_num:1 });
           selectedChatId.value = id;
           sendMessage(inputMessage.value);
         })
@@ -223,6 +223,7 @@ onMounted(() => {
 
   /* 助手消息左对齐 */
 }
+
 
 .message-box {
   text-align: left;
