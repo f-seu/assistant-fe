@@ -19,6 +19,25 @@
           </el-col>
         </el-row>
       </el-row>
+      <el-row class="music-container">
+        <el-col :span="24">
+          <h2>音乐推荐</h2>
+          <h3 class="update-time">更新于 {{ musicUpdateAt }}</h3>
+          <div class="carousel-wrapper">
+            <el-carousel :autoplay="false" arrow="always">
+              <el-carousel-item v-for="item in musics" :key="item.id" class="carousel-item">
+                <div class="image-container">
+                  <a :href="item.url" target="_blank"><img :src="item.poster" class="movie-poster"></a>
+                </div>
+                <div class="text-container">
+                  <h3 class="movie-title">{{ item.title }}</h3>
+                  <h4 class="movie-reason">{{ item.reason }}</h4>
+                </div>
+              </el-carousel-item>
+            </el-carousel>
+          </div>
+        </el-col>
+      </el-row>
       <!-- 电影推荐 -->
       <el-row class="movie-container">
         <el-col :span="24">
@@ -39,25 +58,7 @@
           </div>
         </el-col>
       </el-row>
-      <el-row class="music-container">
-        <el-col :span="24">
-          <h2>音乐推荐</h2>
-          <h3 class="update-time">更新于 {{ musicUpdateAt }}</h3>
-          <div class="carousel-wrapper">
-            <el-carousel :autoplay="false" arrow="always" height="500px">
-              <el-carousel-item v-for="item in musics" :key="item.id" class="carousel-item">
-                <div class="image-container">
-                  <a :href="item.url" target="_blank"><img :src="item.poster" class="movie-poster"></a>
-                </div>
-                <div class="text-container">
-                  <h3 class="movie-title">{{ item.title }}</h3>
-                  <h4 class="movie-reason">{{ item.reason }}</h4>
-                </div>
-              </el-carousel-item>
-            </el-carousel>
-          </div>
-        </el-col>
-      </el-row>
+    
     </el-scrollbar>
   </el-main>
 </template>
@@ -329,13 +330,10 @@ onUnmounted(() => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 500px;
   min-width: 300px;
-  padding: 20px;
 }
 
 .image-container {
-  width: 100%;
   display: flex;
   justify-content: center;
 }
