@@ -5,39 +5,48 @@
 
 <template>
     <el-row class="calendar-container">
-      <!-- 左侧容器 -->
-      <el-col :span="12" class="left-container">
-        <!-- 日历组件 -->
-        <el-calendar v-model="selectDate">
-          <template #date-cell="{ data }">
-            <div :class="['custom-date', { 'is-selected': data.isSelected }]">
-              {{ data.day.split('-').slice(1).join('-') }}
-              <div v-if="hasCalendarDays.includes(data.date.getDate())"> ✔️ </div>
+        <!-- 左侧容器 -->
+        <el-col :span="12" class="left-container">
+            <!-- 日历组件 -->
+            <el-calendar v-model="selectDate">
+                <template #date-cell="{ data }">
+                    <div :class="['custom-date', { 'is-selected': data.isSelected }]">
+                        {{ data.day.split('-').slice(1).join('-') }}
+                        <div v-if="hasCalendarDays.includes(data.date.getDate())"> ✔️ </div>
+                    </div>
+                </template>
+            </el-calendar>
+        </el-col>
+        <!-- 右侧容器 -->
+        <el-col :span="12" class="right-container">
+            <!-- 日程输入和更新 -->
+            <el-form label-position="top" class="plan-form">
+                <el-form-item label="日程内容">
+                    <el-input v-model="calendarContent" type="textarea" rows="8"></el-input>
+                </el-form-item>
+                <!-- 按钮组 -->
+                <div class="button-group">
+                    <el-button type="primary" @click="updateCalendar">更新日程</el-button>
+                    <div v-if="plan == '' || planInProgress == true">
+                        <el-button type="primary" @click="getPlan(false)">规划日程</el-button>
+                    </div>
+                    <div v-else>
+                        <el-button type="primary" @click="getPlan(true)">重新规划</el-button>
+                    </div>
+
+                </div>
+            </el-form>
+            <!-- 规划内容显示 -->
+            <div class="plan-section">
+                <h3 class="plan-title">规划后日程</h3>
+                <el-scrollbar height="400px">
+                    <div class="plan-content" v-html="planRender"></div>
+                </el-scrollbar>
+
             </div>
-          </template>
-        </el-calendar>
-      </el-col>
-      <!-- 右侧容器 -->
-      <el-col :span="12" class="right-container">
-        <!-- 日程输入和更新 -->
-        <el-form label-position="top" class="plan-form">
-          <el-form-item label="日程内容">
-            <el-input v-model="calendarContent" type="textarea" rows="8"></el-input>
-          </el-form-item>
-          <!-- 按钮组 -->
-          <div class="button-group">
-            <el-button type="primary" @click="updateCalendar">更新日程</el-button>
-            <el-button type="primary" @click="getPlan(true)">规划日程</el-button>
-          </div>
-        </el-form>
-        <!-- 规划内容显示 -->
-        <div class="plan-section">
-          <h3 class="plan-title">规划后日程</h3>
-          <div class="plan-content" v-html="planRender"></div>
-        </div>
-      </el-col>
+        </el-col>
     </el-row>
-  </template>
+</template>
 
 
 <script lang="ts" setup>
@@ -51,12 +60,12 @@ const md = markdownit();
 const calendarContent = ref("");
 const plan = ref("");
 const planRender = ref("");
-const planVisible = ref(false);
 const selectDate = ref(new Date());
 const selectMonth = computed(() => {
     return selectDate.value.getMonth();
 });
 const hasCalendarDays = ref<number[]>([]);
+const planInProgress = ref(false);
 
 const getPlan = (forceUpdate) => {
     const date = selectDate.value.toLocaleDateString().split('/');
@@ -65,12 +74,13 @@ const getPlan = (forceUpdate) => {
     const day = parseInt(date[2]);
 
     if (forceUpdate) {
-        planVisible.value = false;
         getPlanAPI(year, month, day, true)
             .then((res) => {
                 const data = res.data;
                 const code = data['code'];
                 if (code == 2002) {
+                    planInProgress.value = true;
+                    planRender.value = "";
                     ElNotification({
                         title: '规划中',
                         message: '规划中，请稍后查看',
@@ -84,6 +94,8 @@ const getPlan = (forceUpdate) => {
                         message: '规划失败，请稍后再试:' + data['msg'],
                         type: 'error',
                     })
+                    planInProgress.value = false;
+                    planRender.value = "";
                 }
                 return;
             })
@@ -93,6 +105,8 @@ const getPlan = (forceUpdate) => {
                     message: '规划失败，请稍后再试:' + err,
                     type: 'error',
                 })
+                planInProgress.value = false;
+                planRender.value = "";
                 return;
             });
 
@@ -107,12 +121,13 @@ const getPlan = (forceUpdate) => {
                     message: '规划中，请稍后查看',
                     type: 'info',
                 })
-
+                planInProgress.value = true;
+                planRender.value = "";
                 return;
             }
             else if (code == 0) {
                 plan.value = res.data['data']['content'];
-                planVisible.value = true;
+                planInProgress.value = false;
                 return;
             }
             else {
@@ -121,6 +136,8 @@ const getPlan = (forceUpdate) => {
                     message: '规划失败，请稍后再试:' + res.data['msg'],
                     type: 'error',
                 })
+                planInProgress.value = false;
+                planRender.value = "";
                 return;
             }
 
@@ -255,56 +272,58 @@ onMounted(() => {
 
 <style scoped>
 .calendar-container {
-  padding: 20px;
+    padding: 20px;
 }
 
 .left-container,
 .right-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .custom-date {
-  text-align: center;
+    text-align: center;
 }
 
 .is-selected {
-  color: #1989fa;
+    color: #1989fa;
 }
 
 .plan-form {
-  margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 
 .button-group {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
 }
 
 .plan-section {
-  flex: 1;
-  border: 1px solid #ebeef5;
-  padding: 10px;
-  box-sizing: border-box;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+    flex: 1;
+    border: 1px solid #ebeef5;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .plan-title {
-  margin: 0 0 10px 0;
-  font-size: 16px;
-  font-weight: bold;
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    font-weight: bold;
 }
 
 .plan-content {
-  flex: 1;
-  overflow-y: auto;
+    flex: 1;
+    overflow-y: auto;
+   
+    text-align: left;
 }
 
 .el-button {
-  margin-top: 10px;
+    margin-top: 10px;
 }
 </style>
