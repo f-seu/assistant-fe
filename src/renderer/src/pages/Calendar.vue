@@ -217,7 +217,6 @@ const getCalendarContent = (date) => {
 }
 
 const getHasCalendar = (year, month) => {
-    console.log("get has")
     getHasCalendarAPI(
         year,
         month

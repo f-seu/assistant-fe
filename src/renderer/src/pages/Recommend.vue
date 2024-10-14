@@ -65,7 +65,7 @@
 
 
 <script lang="ts" setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted,onActivated,onDeactivated } from 'vue';
 import { getRecommendAPI } from '@renderer/request/api';
 import { ElNotification } from 'element-plus'
 
@@ -106,8 +106,9 @@ function initWebSocket() {
   }
 
   websocket = new WebSocket(wsUrl);
-
+  console.log('Connecting to WebSocket server...');
   websocket.onopen = () => {
+    console.log('WebSocket connection established.');
     ElNotification({
       title: 'ws连接成功',
       message: 'ws连接成功',
@@ -119,15 +120,16 @@ function initWebSocket() {
 
   websocket.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    console.log(data);
     apps.value = data.content;
     appUpdateAt.value = formatTime(data.create_at);
   };
 
-  websocket.onerror = (error) => {
+  websocket.onerror = (event) => {
+    console.error('WebSocket error:', event);
+    const errorMessage = event instanceof ErrorEvent ? event.message : 'Unknown error';
     ElNotification({
       title: 'ws连接中断',
-      message: 'ws连接中断，正在尝试重新连接:' + error,
+      message: `ws连接中断，正在尝试重新连接: ${errorMessage}`,
       type: 'error',
     });
     handleReconnect();  // Trigger reconnection logic
@@ -136,7 +138,6 @@ function initWebSocket() {
   websocket.onclose = () => {
     connectionStatus.value = 'Disconnected';
     console.log('WebSocket connection closed.');
-    handleReconnect();  // Trigger reconnection logic
   };
 }
 
@@ -232,16 +233,23 @@ const formatTime = (isoString) => {
   const seconds = String(date.getSeconds()).padStart(2, '0');
   return `${hours}:${minutes}:${seconds}`;
 }
-onMounted(() => {
-  initWebSocket();
+onActivated(() => {
+  console.log('Recommend page activated.');
+  // initWebSocket();
+
   getMovieRecommend();
   getMusicRecommend();
 });
 
-onUnmounted(() => {
-  if (websocket) {
-    websocket.close();
-  }
+onMounted(() => {
+  console.log('Recommend page mounted.');
+  initWebSocket();
+});
+
+onDeactivated(() => {
+  // if (websocket) {
+  //   websocket.close();
+  // }
 });
 </script>
 
